@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>BASE 新宿店 サービスアンケート</title>
   <style>
-    /* 共通スタイル */
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f7f7f7; color: #333; }
     .container { max-width: 800px; margin: 20px auto; background-color: #fff; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
     h1 { font-size: 1.8em; margin-bottom: 20px; text-align: center; }
@@ -14,11 +13,11 @@
     .selected { color: gold; }
     textarea { width: 93%; height: 80px; resize: vertical; padding: 10px; font-size: 1em; margin-bottom: 10px; }
     .step { margin-top: 20px; }
-    .button { padding: 10px 20px; font-size: 1em; margin-top: 10px; display: inline-block; border: none; background-color: #007bff; color: #fff; border-radius: 4px; cursor: pointer; }
+    .button { padding: 10px 20px; font-size: 1em; margin-top: 10px; border: none; background-color: #007bff; color: #fff; border-radius: 4px; cursor: pointer; }
     .button:active { transform: scale(0.98); }
     .hidden { display: none; }
     .arrow-down { font-size: 24px; text-align: center; margin-top: 10px; color: #E83F8B; animation: bounce 1.2s infinite; }
-    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
     .copy-button { background-color: #e83e8c; }
     .copy-button:hover { background-color: #d63384; }
     @media screen and (max-width: 600px) {
@@ -32,47 +31,37 @@
 <body>
   <div class="container">
     <h1>BASE 新宿店<br>サービスアンケート</h1>
-    <!-- 初期UI -->
     <div id="initialForm">
       <div class="star-rating" id="starRating">
-        <span data-value="1">★</span>
-        <span data-value="2">★</span>
-        <span data-value="3">★</span>
-        <span data-value="4">★</span>
+        <span data-value="1">★</span><span data-value="2">★</span>
+        <span data-value="3">★</span><span data-value="4">★</span>
         <span data-value="5">★</span>
       </div>
       <textarea id="comment" placeholder="ご意見・ご感想をお書きください"></textarea>
       <button id="submitBtn" class="button">送信</button>
     </div>
-
-    <!-- 低評価（★1〜2） -->
     <div id="lowRatingFlow" class="hidden">
-      <!-- ステップ1 -->
       <div id="lowStep1" class="step">
         <label>【ステップ1 / 5】 ご不満に思われた点をお聞かせください</label>
         <textarea id="lowStep1Input" placeholder="例：待ち時間が長かった等"></textarea>
         <button class="button" onclick="nextStep(1)">送信</button>
       </div>
-      <!-- ステップ2 -->
       <div id="lowStep2" class="step hidden">
         <label>【ステップ2 / 5】 どのような改善があればよかったと感じられましたか？</label>
         <textarea id="lowStep2Input" placeholder="例：スタッフの対応改善等"></textarea>
         <button class="button" onclick="nextStep(2)">送信</button>
       </div>
-      <!-- ステップ3 -->
       <div id="lowStep3" class="step hidden">
         <label>【ステップ3 / 5】 今回のようなことは以前にもありましたか？ 一言頂けると幸いです。</label>
         <textarea id="lowStep3Input" placeholder="例：◯月にも同じことがありました"></textarea>
         <button class="button" onclick="nextStep(3)">送信</button>
       </div>
-      <!-- ステップ4 -->
       <div id="lowStep4" class="step hidden">
         <label>【ステップ4 / 5】 今後またご来店いただけますか？</label><br>
         <input type="radio" name="lowStep4" value="はい" id="lowStep4Yes"><label for="lowStep4Yes">はい</label>
         <input type="radio" name="lowStep4" value="いいえ" id="lowStep4No"><label for="lowStep4No">いいえ</label><br>
         <button class="button" onclick="nextStep(4)">送信</button>
       </div>
-      <!-- ステップ5 -->
       <div id="lowStep5" class="step hidden">
         <p>【最後に】ご意見ありがとうございました。<br>
         いただいたご感想は今後の改善に活かしてまいります。<br>
@@ -80,8 +69,6 @@
         <button class="button" onclick="finishLowRating()">完了</button>
       </div>
     </div>
-
-    <!-- 高評価（★3〜5） -->
     <div id="highRatingSteps" class="hidden">
       <div class="step">
         <p>ご感想ありがとうございました。<br>
@@ -98,39 +85,38 @@
         <button id="noPostBtn" class="button">今回は投稿しない</button>
       </div>
     </div>
-
   </div>
-
   <script>
     let rating = 0;
     const stars = document.querySelectorAll("#starRating span");
-    stars.forEach(star => {
-      star.addEventListener("click", () => {
-        rating = parseInt(star.getAttribute("data-value"));
-        stars.forEach(s => s.classList.toggle("selected", parseInt(s.getAttribute("data-value")) <= rating));
-      });
-    });
+    stars.forEach(star => star.addEventListener("click", () => {
+      rating = parseInt(star.getAttribute("data-value"));
+      stars.forEach(s => s.classList.toggle("selected", parseInt(s.getAttribute("data-value")) <= rating));
+    }));
 
     document.getElementById("submitBtn").addEventListener("click", () => {
       if (rating === 0) { alert("星評価を選択してください。"); return; }
+      const comment = document.getElementById("comment").value.trim();
       document.getElementById("initialForm").classList.add("hidden");
       if (rating <= 2) {
         document.getElementById("lowRatingFlow").classList.remove("hidden");
       } else {
         document.getElementById("highRatingSteps").classList.remove("hidden");
-        document.getElementById("highCommentDisplay").innerText = document.getElementById("comment").value.trim();
+        document.getElementById("highCommentDisplay").innerText = comment;
         document.getElementById("copyButtonSection").classList.remove("hidden");
       }
     });
 
     function nextStep(step) {
       let valid = true;
-      const input = document.getElementById("lowStep" + step + "Input").value.trim();
-      if (!input) { alert("必須項目です。ご入力ください。"); valid = false; }
       if (step === 4) {
         const radios = document.getElementsByName("lowStep4");
-        valid = Array.from(radios).some(r => r.checked);
-        if (!valid) alert("必須項目です。選択してください。");
+        if (!Array.from(radios).some(r => r.checked)) {
+          alert("必須項目です。選択してください。"); valid = false;
+        }
+      } else {
+        const input = document.getElementById("lowStep" + step + "Input").value.trim();
+        if (input === "") { alert("必須項目です。ご入力ください。"); valid = false; }
       }
       if (valid) {
         document.getElementById("lowStep" + step).classList.add("hidden");
@@ -147,7 +133,7 @@
     });
 
     document.getElementById("postReviewBtn").addEventListener("click", () => {
-      window.open("https://search.google.com/local/writereview?placeid=ChIJ77j-rsiNGGARSYNmaCHcbV0","_blank");
+      window.open("https://search.google.com/local/writereview?placeid=ChIJ77j-rsiNGGARSYNmaCHcbV0", "_blank");
     });
 
     document.getElementById("noPostBtn").addEventListener("click", () => { alert("ご利用ありがとうございました"); });
